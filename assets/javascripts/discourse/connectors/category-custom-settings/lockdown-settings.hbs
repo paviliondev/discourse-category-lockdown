@@ -1,8 +1,14 @@
-<section class='field'>
-  <div class="enable-lockdown">
+  <section class="field">
     <label class="checkbox-label">
-      {{input type="checkbox" checked=category.enable_lockdown}}
-      {{i18n 'solved.allow_lockdown'}}
+      {{input type="checkbox" checked=category.lockdown_enabled}}
+      {{i18n 'lockdown.lockdown_enabled'}}
     </label>
-  </div>
-</section>
+  </section>
+  {{#if category.lockdown_enabled}}
+    <section class="field">
+      <label>
+        {{i18n 'lockdown.lockdown_allowed_groups'}}:
+        {{group-selector groupNames=category.custom_fields.lockdown_allowed_groups groupFinder=groupFinder classNames="lockdownAllowedGroups"}}
+      </label>
+    </section>
+  {{/if}}

@@ -1,0 +1,5 @@
+en:
+  site_settings:
+    category_lockdown_enabled: Enable discourse-category-lockdown?
+    category_lockdown_list_icon: The fa-icon name to display next to topics which are locked down
+    category_lockdown_redirect_url: The URL to redirect unauthorised visitors to when they try to access a locked-down topic

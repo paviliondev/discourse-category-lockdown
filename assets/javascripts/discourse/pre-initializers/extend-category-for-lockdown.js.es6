@@ -8,14 +8,14 @@ export default {
 
     Category.reopen({
 
-      @property('custom_fields.enable_lockdown')
-      enable_lockdown: {
-        get(enableField) {
-          return enableField === "true";
+      @property('custom_fields.lockdown_enabled')
+      lockdown_enabled: {
+        get(value) {
+          return value === "true";
         },
         set(value) {
-          value = value ? "true" : "false";
-          this.set("custom_fields.enable_lockdown", value);
+          const saveVal = value ? "true" : "false";
+          this.set("custom_fields.lockdown_enabled", saveVal);
           return value;
         }
       }

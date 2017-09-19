@@ -1,4 +1,10 @@
 plugins:
+  category_lockdown_enabled:
+    default: false
+    client: true
+  category_lockdown_list_icon:
+    default: 'credit-card'
+    client: true
   category_lockdown_redirect_url: 
     default: "/"
     client: true
