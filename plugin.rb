@@ -20,7 +20,7 @@ after_initialize do
       allowed_groups = topic.category&.custom_fields&.[]("lockdown_allowed_groups")
       allowed_groups = allowed_groups.split(',')
 
-      in_allowed_groups = guardian.user&.groups.where(name: allowed_groups).exists?
+      in_allowed_groups = guardian&.user&.groups&.where(name: allowed_groups)&.exists?
 
       return !in_allowed_groups
     end
