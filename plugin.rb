@@ -29,6 +29,7 @@ after_initialize do
   end
 
   # Restrict topic views, including RSS/Print/Search-engine
+  require_dependency 'topic_view'
   class ::TopicView
     alias_method :old_check_and_raise_exceptions, :check_and_raise_exceptions
 
@@ -43,6 +44,7 @@ after_initialize do
   TopicList.preloaded_custom_fields << "lockdown_enabled"
   TopicList.preloaded_custom_fields << "lockdown_allowed_groups"
 
+  require_dependency 'application_controller'
   class ::ApplicationController
     rescue_from ::CategoryLockdown::NoAccessLocked do
       rescue_discourse_actions(:invalid_access, 402, true)
@@ -51,6 +53,7 @@ after_initialize do
 
   # Restrict access to posts (e.g. /raw/12/2)
   # Also covers notifications, so people cannot 'watch' the topic
+  require_dependency 'guardian'
   module ::PostGuardian
     alias_method :old_can_see_post?, :can_see_post?
 
@@ -66,6 +69,7 @@ after_initialize do
 
   # Add a boolean to the topic list serializer
   # So that we can show an icon next to each topic
+  require_dependency 'topic_list_item_serializer'
   class ::TopicListItemSerializer
     attributes :is_locked_down
 
