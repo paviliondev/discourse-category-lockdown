@@ -63,6 +63,4 @@ RSpec.describe 'CategoryLockdown', type: :request do
     end
   end
 
-
-
 end
