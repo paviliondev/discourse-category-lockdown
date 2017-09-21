@@ -9,7 +9,15 @@ function initializeLockdown(api) {
     errorLoading(result){
       const status = result.jqXHR.status;
       if(status === 402){
-        return DiscourseURL.handleURL(this.siteSettings.category_lockdown_redirect_url, {replaceURL: true});
+        const redirectURL = this.siteSettings.category_lockdown_redirect_url;
+        const external = redirectURL.startsWith("http");
+        if(external){
+          // Use location.replace so that the user can go back in one click
+          document.location.replace(redirectURL);
+        }else{
+          // Handle the redirect inside ember
+          return DiscourseURL.handleURL(redirectURL, {replaceURL: true});
+        }
       }
       return this._super();
     }
