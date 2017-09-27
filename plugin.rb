@@ -47,7 +47,7 @@ after_initialize do
   require_dependency 'application_controller'
   class ::ApplicationController
     rescue_from ::CategoryLockdown::NoAccessLocked do
-      rescue_discourse_actions(:invalid_access, 402, true)
+      rescue_discourse_actions(:invalid_access, 402, include_ember: true)
     end
   end
 
