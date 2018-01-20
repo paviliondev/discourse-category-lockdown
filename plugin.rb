@@ -18,6 +18,7 @@ after_initialize do
       return false if !locked_down
 
       allowed_groups = topic.category&.custom_fields&.[]("lockdown_allowed_groups")
+      allowed_groups = '' if allowed_groups.nil?
       allowed_groups = allowed_groups.split(',')
 
       in_allowed_groups = guardian&.user&.groups&.where(name: allowed_groups)&.exists?
