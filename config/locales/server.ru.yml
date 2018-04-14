@@ -1,0 +1,5 @@
+ru:
+  site_settings:
+    category_lockdown_enabled: "Включить discourse-category-lockdown?"
+    category_lockdown_list_icon: "Имя fa-icon для отображения рядом с темами, которые закрыты"
+    category_lockdown_redirect_url: "URL для перенаправления неавторизованных посетителей при попытке доступа к закрытой теме"
