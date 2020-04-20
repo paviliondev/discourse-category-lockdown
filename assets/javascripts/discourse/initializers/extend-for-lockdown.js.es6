@@ -11,7 +11,7 @@ function initializeLockdown(api) {
       const status = result.jqXHR.status;
 
       if(status === 402){
-        let redirectURL = this.get('topic.category.redirect_url') ||
+        let redirectURL = result.jqXHR.responseJSON.errors[0] ||
                           this.siteSettings.category_lockdown_redirect_url;
 
         const external = redirectURL.startsWith("http");

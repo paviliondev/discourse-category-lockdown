@@ -55,8 +55,9 @@ after_initialize do
       opts = {
         include_ember: true
       }
-      topic = Topic.find(params["topic_id"].to_i) if params["topic_id"]
-      opts[:original_path] = topic.category.custom_fields["redirect_url"] if topic
+      topic_id = params["topic_id"] || params["id"]
+      topic = Topic.find(topic_id.to_i) if topic_id
+      opts[:custom_message_translated] = topic.category.custom_fields["redirect_url"] if topic
 
       rescue_discourse_actions(:invalid_access, 402, opts)
     end
