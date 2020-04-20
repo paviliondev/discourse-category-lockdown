@@ -11,17 +11,17 @@ function initializeLockdown(api) {
       const status = result.jqXHR.status;
 
       if(status === 402){
-          let redirectURL = this.get('topic.category.redirect_url') ||
-                            this.siteSettings.category_lockdown_redirect_url;
+        let redirectURL = this.get('topic.category.redirect_url') ||
+                          this.siteSettings.category_lockdown_redirect_url;
 
-          const external = redirectURL.startsWith("http");
-          if(external){
-            // Use location.replace so that the user can go back in one click
-            document.location.replace(redirectURL);
-          }else{
-            // Handle the redirect inside ember
-            return DiscourseURL.handleURL(redirectURL, {replaceURL: true});
-          }
+        const external = redirectURL.startsWith("http");
+        if(external){
+          // Use location.replace so that the user can go back in one click
+          document.location.replace(redirectURL);
+        }else{
+          // Handle the redirect inside ember
+          return DiscourseURL.handleURL(redirectURL, {replaceURL: true});
+        }
       }
       return this._super();
     }
