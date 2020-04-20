@@ -9,6 +9,10 @@ enabled_site_setting :category_lockdown_enabled
 register_asset 'stylesheets/lockdown.scss'
 
 after_initialize do
+  Site.preloaded_category_custom_fields << 'redirect_url'
+  add_to_serializer(:basic_category, :redirect_url, false) do
+    object.custom_fields['redirect_url']
+  end
 
   module ::CategoryLockdown
     def self.is_locked(guardian, topic)
