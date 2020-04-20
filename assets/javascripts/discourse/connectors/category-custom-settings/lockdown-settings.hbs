@@ -1,3 +1,4 @@
+  <h3>{{i18n 'lockdown.category_setting_heading'}}</h3>
   <section class="field">
     <label class="checkbox-label">
       {{input type="checkbox" checked=category.lockdown_enabled}}
@@ -5,6 +6,12 @@
     </label>
   </section>
   {{#if category.lockdown_enabled}}
+    <section class='field'>
+      <label>
+        url to redirect
+        {{input type='text' value=category.redirect_url}}
+      </label>
+    </section>
     <section class="field">
       <label>
         {{i18n 'lockdown.lockdown_allowed_groups'}}:
