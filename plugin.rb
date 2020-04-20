@@ -52,7 +52,13 @@ after_initialize do
   require_dependency 'application_controller'
   class ::ApplicationController
     rescue_from ::CategoryLockdown::NoAccessLocked do
-      rescue_discourse_actions(:invalid_access, 402, include_ember: true)
+      opts = {
+        include_ember: true
+      }
+      topic = Topic.find(params["topic_id"].to_i) if params["topic_id"]
+      opts[:original_path] = topic.category.custom_fields["redirect_url"] if topic
+
+      rescue_discourse_actions(:invalid_access, 402, opts)
     end
   end
 
