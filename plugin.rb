@@ -35,17 +35,16 @@ after_initialize do
 
   # Restrict topic views, including RSS/Print/Search-engine
   require_dependency 'topic_view'
-  class ::TopicView
-    alias_method :old_check_and_raise_exceptions, :check_and_raise_exceptions
 
-    def check_and_raise_exceptions
-      old_check_and_raise_exceptions
-
-      if SiteSetting.category_lockdown_enabled
-        raise ::CategoryLockdown::NoAccessLocked.new if CategoryLockdown.is_locked(@guardian, @topic)
-      end
+  module TopicViewLockdownExtension
+    def check_and_raise_exceptions(skip_staff_action)
+      super
+      raise ::CategoryLockdown::NoAccessLocked.new if CategoryLockdown.is_locked(@guardian, @topic)
     end
   end
+
+  ::TopicView.prepend TopicViewLockdownExtension if SiteSetting.category_lockdown_enabled
+
   TopicList.preloaded_custom_fields << "lockdown_enabled"
   TopicList.preloaded_custom_fields << "lockdown_allowed_groups"
 
