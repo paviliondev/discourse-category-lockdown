@@ -39,11 +39,11 @@ after_initialize do
   module TopicViewLockdownExtension
     def check_and_raise_exceptions(skip_staff_action)
       super
-      raise ::CategoryLockdown::NoAccessLocked.new if CategoryLockdown.is_locked(@guardian, @topic)
+      raise ::CategoryLockdown::NoAccessLocked.new if SiteSetting.category_lockdown_enabled && CategoryLockdown.is_locked(@guardian, @topic)
     end
   end
 
-  ::TopicView.prepend TopicViewLockdownExtension if SiteSetting.category_lockdown_enabled
+  ::TopicView.prepend TopicViewLockdownExtension 
 
   TopicList.preloaded_custom_fields << "lockdown_enabled"
   TopicList.preloaded_custom_fields << "lockdown_allowed_groups"
