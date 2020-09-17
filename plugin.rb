@@ -58,7 +58,7 @@ after_initialize do
       topic = Topic.find(topic_id.to_i) if topic_id
       opts[:custom_message_translated] = topic.category.custom_fields["redirect_url"] if topic
 
-      rescue_discourse_actions(:invalid_access, 402, opts)
+      rescue_discourse_actions(:invalid_access, 402, opts) unless use_crawler_layout?
     end
   end
 
