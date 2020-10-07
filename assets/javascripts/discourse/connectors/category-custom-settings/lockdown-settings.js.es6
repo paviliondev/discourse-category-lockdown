@@ -6,4 +6,8 @@ export default {
       return Group.findAll({ term: term, ignore_automatic: false });
     });
   },
+
+  shouldRender(args, component) {
+    return component.siteSettings.category_lockdown_enabled;
+  },
 };

@@ -5,3 +5,4 @@ en:
       lockdown_allowed_groups: "Groups which are allowed to view topics without redirection"
       topic_is_locked_down: "This topic is only available to members of certain groups"
       category_setting_heading: "Category Lockdown"
+      category_setting_url_to_redirect: "URL to redirect"

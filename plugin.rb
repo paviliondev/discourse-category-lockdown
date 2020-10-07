@@ -12,8 +12,17 @@ register_asset 'stylesheets/lockdown.scss'
 
 after_initialize do
   Site.preloaded_category_custom_fields << 'redirect_url'
+
   add_to_serializer(:basic_category, :redirect_url, false) do
     object.custom_fields['redirect_url']
+  end
+
+  add_to_serializer(:topic_list_item, :is_locked_down) do
+    ::CategoryLockdown.is_locked(scope, object)
+  end
+
+  add_to_serializer(:topic_list_item, :include_is_locked_down?) do
+    SiteSetting.category_lockdown_enabled
   end
 
   module ::CategoryLockdown
@@ -36,12 +45,11 @@ after_initialize do
   end
 
   # Restrict topic views, including RSS/Print/Search-engine
-  require_dependency 'topic_view'
 
   module TopicViewLockdownExtension
     def check_and_raise_exceptions(skip_staff_action)
       super
-      raise ::CategoryLockdown::NoAccessLocked.new if SiteSetting.category_lockdown_enabled && CategoryLockdown.is_locked(@guardian, @topic)
+      raise ::CategoryLockdown::NoAccessLocked.new if SiteSetting.category_lockdown_enabled && ::CategoryLockdown.is_locked(@guardian, @topic)
     end
   end
 
@@ -50,7 +58,6 @@ after_initialize do
   TopicList.preloaded_custom_fields << "lockdown_enabled"
   TopicList.preloaded_custom_fields << "lockdown_allowed_groups"
 
-  require_dependency 'application_controller'
   class ::ApplicationController
     rescue_from ::CategoryLockdown::NoAccessLocked do
       opts = {
@@ -66,34 +73,14 @@ after_initialize do
 
   # Restrict access to posts (e.g. /raw/12/2)
   # Also covers notifications, so people cannot 'watch' the topic
-  require_dependency 'guardian'
-  module ::PostGuardian
-    alias_method :old_can_see_post?, :can_see_post?
+  module PostGuardianExtension
 
     def can_see_post?(post)
-      return old_can_see_post?(post) unless SiteSetting.category_lockdown_enabled
 
-      return false if !old_can_see_post?(post)
       return false if ::CategoryLockdown.is_locked(self, post.topic)
-
-      true
+      super
     end
   end
 
-  # Add a boolean to the topic list serializer
-  # So that we can show an icon next to each topic
-  require_dependency 'topic_list_item_serializer'
-  class ::TopicListItemSerializer
-    attributes :is_locked_down
-
-    def is_locked_down
-      ::CategoryLockdown.is_locked(scope, object)
-    end
-
-    def include_is_locked_down?
-      SiteSetting.category_lockdown_enabled
-    end
-
-  end
-
+  ::Guardian.prepend PostGuardianExtension if SiteSetting.category_lockdown_enabled
 end
