@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 # name: discourse-category-lockdown
 # about: Set all topics in a category to redirect, unless part of a specified group
 # version: 0.1
@@ -7,12 +8,22 @@
 enabled_site_setting :category_lockdown_enabled
 
 register_asset 'stylesheets/lockdown.scss'
+gem 'request_store', '1.5.0', require: true
 
 after_initialize do
   Site.preloaded_category_custom_fields << 'redirect_url'
   add_to_serializer(:basic_category, :redirect_url, false) do
     object.custom_fields['redirect_url']
   end
+
+  module ::TopicControllerLockdownExtension
+    def show
+      ::RequestStore.store[:is_crawler] = use_crawler_layout?
+      super
+    end
+  end
+
+  ::TopicsController.prepend ::TopicControllerLockdownExtension
 
   module ::CategoryLockdown
     def self.is_locked(guardian, topic)
@@ -27,7 +38,7 @@ after_initialize do
 
       in_allowed_groups = guardian&.user&.groups&.where(name: allowed_groups)&.exists?
 
-      return !in_allowed_groups
+      !in_allowed_groups
     end
 
     class NoAccessLocked < StandardError; end
@@ -39,11 +50,12 @@ after_initialize do
   module TopicViewLockdownExtension
     def check_and_raise_exceptions(skip_staff_action)
       super
+      return if ::RequestStore.store[:is_crawler]
       raise ::CategoryLockdown::NoAccessLocked.new if SiteSetting.category_lockdown_enabled && CategoryLockdown.is_locked(@guardian, @topic)
     end
   end
 
-  ::TopicView.prepend TopicViewLockdownExtension 
+  ::TopicView.prepend TopicViewLockdownExtension
 
   TopicList.preloaded_custom_fields << "lockdown_enabled"
   TopicList.preloaded_custom_fields << "lockdown_allowed_groups"
