@@ -5,6 +5,13 @@ export default {
     component.set('groupFinder', (term) => {
       return Group.findAll({ term: term, ignore_automatic: false });
     });
-  }
-
+  },
+  actions: {
+    onChangeSetting(value) {
+      this.set(
+        "category.custom_fields.lockdown_enabled",
+        value ? "true" : "false"
+      );
+    },
+  },
 };

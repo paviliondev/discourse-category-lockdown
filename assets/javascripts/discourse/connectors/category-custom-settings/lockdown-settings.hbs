@@ -1,7 +1,11 @@
   <h3>{{i18n 'lockdown.category_setting_heading'}}</h3>
   <section class="field">
     <label class="checkbox-label">
-      {{input type="checkbox" checked=category.lockdown_enabled}}
+      {{input
+        type="checkbox"
+        checked=(readonly category.lockdown_enabled)
+        change=(action "onChangeSetting" value="target.checked")
+      }}
       {{i18n 'lockdown.lockdown_enabled'}}
     </label>
   </section>

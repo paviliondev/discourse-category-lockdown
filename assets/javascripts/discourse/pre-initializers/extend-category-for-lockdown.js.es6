@@ -6,7 +6,14 @@ export default {
   before: 'inject-discourse-objects',
   initialize() {
     Category.reopen({
-      lockdown_enabled: alias('custom_fields.lockdown_enabled'),
+      lockdown_enabled: Ember.computed(
+        "custom_fields.lockdown_enabled",
+        {
+          get(fieldName) {
+            return Ember.get(this.custom_fields, fieldName) === "true";
+          },
+        }
+      ),
       redirect_url: alias('custom_fields.redirect_url'),
     });
   }
