@@ -16,6 +16,37 @@ after_initialize do
     object.custom_fields['redirect_url']
   end
 
+  def before_head_close_meta(controller)
+    return "" if !controller.instance_of? TopicsController
+    return "" unless SiteSetting.category_lockdown_enabled
+    return "" unless ::RequestStore.store[:is_crawler]
+
+    topic_view = controller.instance_variable_get(:@topic_view)
+    topic = topic_view&.topic
+    return "" if !topic
+
+    if CategoryLockdown.is_locked(controller.guardian, topic)
+      ['<script type="application/ld+json">', MultiJson.dump(
+        '@context' => 'http://schema.org',
+        '@type' => 'CreativeWork',
+        'name' => topic&.title,
+        'isAccessibleForFree' => 'False',
+        'hasPart' => {
+          '@type' => 'DiscussionForumPosting',
+          'isAccessibleForFree' => 'False',
+          'cssSelector' => 'body'
+        },
+      ).gsub("</", "<\\/").html_safe, 
+        '</script>',
+        '<meta name="robots" content="noarchive">'
+      ].join("")  
+    end
+  end
+
+  register_html_builder('server:before-head-close-crawler') do |controller|
+    before_head_close_meta(controller)
+  end
+
   module ::TopicControllerLockdownExtension
     def show
       ::RequestStore.store[:is_crawler] = use_crawler_layout?
