@@ -19,6 +19,7 @@ after_initialize do
   def before_head_close_meta(controller)
     return "" if !controller.instance_of? TopicsController
     return "" unless SiteSetting.category_lockdown_enabled
+    return "" unless SiteSetting.category_lockdown_allow_crawlers
     return "" unless ::RequestStore.store[:is_crawler]
 
     topic_view = controller.instance_variable_get(:@topic_view)
@@ -26,20 +27,29 @@ after_initialize do
     return "" if !topic
 
     if CategoryLockdown.is_locked(controller.guardian, topic)
-      ['<script type="application/ld+json">', MultiJson.dump(
-        '@context' => 'http://schema.org',
-        '@type' => 'CreativeWork',
-        'name' => topic&.title,
-        'isAccessibleForFree' => 'False',
-        'hasPart' => {
-          '@type' => 'DiscussionForumPosting',
-          'isAccessibleForFree' => 'False',
-          'cssSelector' => 'body'
-        },
-      ).gsub("</", "<\\/").html_safe, 
-        '</script>',
-        '<meta name="robots" content="noarchive">'
-      ].join("")  
+      inject = []
+      if SiteSetting.category_lockdown_crawler_indicate_paywall
+        inject.push [
+          '<script type="application/ld+json">', 
+          MultiJson.dump(
+            '@context' => 'http://schema.org',
+            '@type' => 'CreativeWork',
+            'name' => topic&.title,
+            'isAccessibleForFree' => 'False',
+            'hasPart' => {
+              '@type' => 'DiscussionForumPosting',
+              'isAccessibleForFree' => 'False',
+              'cssSelector' => 'body'
+            },
+          ).gsub("</", "<\\/").html_safe, 
+          '</script>',
+        ].join("")  
+      end
+      if SiteSetting.category_lockdown_crawler_noarchive
+        inject.push '<meta name="robots" content="noarchive">'
+      end
+
+      inject.join("\n")
     end
   end
 
@@ -81,7 +91,7 @@ after_initialize do
   module TopicViewLockdownExtension
     def check_and_raise_exceptions(skip_staff_action)
       super
-      return if ::RequestStore.store[:is_crawler]
+      return if ::RequestStore.store[:is_crawler] && SiteSetting.category_lockdown_allow_crawlers
       raise ::CategoryLockdown::NoAccessLocked.new if SiteSetting.category_lockdown_enabled && CategoryLockdown.is_locked(@guardian, @topic)
     end
   end
