@@ -9,9 +9,9 @@ function initializeLockdown(api) {
   api.modifyClass('model:post-stream', {
     errorLoading(result){
       const status = result.jqXHR.status;
-
+      let response = result.jqXHR.responseJSON;
       if(status === 402){
-        let redirectURL = result.jqXHR.responseJSON.errors[0] ||
+        let redirectURL = response.redirect_url ||
                           this.siteSettings.category_lockdown_redirect_url;
 
         const external = redirectURL.startsWith("http");
