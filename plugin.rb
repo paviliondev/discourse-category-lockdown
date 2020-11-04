@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 # name: discourse-category-lockdown
 # about: Set all topics in a category to redirect, unless part of a specified group
 # version: 0.1
@@ -27,7 +28,7 @@ after_initialize do
 
       in_allowed_groups = guardian&.user&.groups&.where(name: allowed_groups)&.exists?
 
-      return !in_allowed_groups
+      !in_allowed_groups
     end
 
     class NoAccessLocked < StandardError; end
@@ -43,7 +44,7 @@ after_initialize do
     end
   end
 
-  ::TopicView.prepend TopicViewLockdownExtension 
+  ::TopicView.prepend TopicViewLockdownExtension
 
   TopicList.preloaded_custom_fields << "lockdown_enabled"
   TopicList.preloaded_custom_fields << "lockdown_allowed_groups"
@@ -61,12 +62,12 @@ after_initialize do
       }
       response[:redirect_url] = topic.category.custom_fields["redirect_url"] if topic
       response[:redirect_url] ||= SiteSetting.category_lockdown_redirect_url
-      if request.format.json? 
+      if request.format.json?
         render_json_dump(response, status: 402)
       else
         redirect_to path(response[:redirect_url]), status: :moved_permanently
       end
-      
+
     end
   end
 
