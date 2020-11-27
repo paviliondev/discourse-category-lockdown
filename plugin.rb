@@ -109,9 +109,17 @@ after_initialize do
       }
       topic_id = params["topic_id"] || params["id"]
       topic = Topic.find(topic_id.to_i) if topic_id
-      opts[:custom_message_translated] = topic.category.custom_fields["redirect_url"] if topic
+      response = {
+        error: "Payment Required",
+      }
+      response[:redirect_url] = topic.category.custom_fields["redirect_url"] if topic
+      response[:redirect_url] ||= SiteSetting.category_lockdown_redirect_url
+      if request.format.json?
+        render_json_dump(response, status: 402)
+      else
+        redirect_to path(response[:redirect_url]), status: :moved_permanently
+      end
 
-      rescue_discourse_actions(:invalid_access, 402, opts)
     end
   end
 
