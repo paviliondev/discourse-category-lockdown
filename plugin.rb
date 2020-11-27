@@ -8,12 +8,63 @@
 enabled_site_setting :category_lockdown_enabled
 
 register_asset 'stylesheets/lockdown.scss'
+gem 'request_store', '1.5.0', require: true
 
 after_initialize do
   Site.preloaded_category_custom_fields << 'redirect_url'
   add_to_serializer(:basic_category, :redirect_url, false) do
     object.custom_fields['redirect_url']
   end
+
+  def before_head_close_meta(controller)
+    return "" if !controller.instance_of? TopicsController
+    return "" unless SiteSetting.category_lockdown_enabled
+    return "" unless SiteSetting.category_lockdown_allow_crawlers
+    return "" unless ::RequestStore.store[:is_crawler]
+
+    topic_view = controller.instance_variable_get(:@topic_view)
+    topic = topic_view&.topic
+    return "" if !topic
+
+    if CategoryLockdown.is_locked(controller.guardian, topic)
+      inject = []
+      if SiteSetting.category_lockdown_crawler_indicate_paywall
+        inject.push [
+          '<script type="application/ld+json">', 
+          MultiJson.dump(
+            '@context' => 'http://schema.org',
+            '@type' => 'CreativeWork',
+            'name' => topic&.title,
+            'isAccessibleForFree' => 'False',
+            'hasPart' => {
+              '@type' => 'DiscussionForumPosting',
+              'isAccessibleForFree' => 'False',
+              'cssSelector' => 'body'
+            },
+          ).gsub("</", "<\\/").html_safe, 
+          '</script>',
+        ].join("")  
+      end
+      if SiteSetting.category_lockdown_crawler_noarchive
+        inject.push '<meta name="robots" content="noarchive">'
+      end
+
+      inject.join("\n")
+    end
+  end
+
+  register_html_builder('server:before-head-close-crawler') do |controller|
+    before_head_close_meta(controller)
+  end
+
+  module ::TopicControllerLockdownExtension
+    def show
+      ::RequestStore.store[:is_crawler] = use_crawler_layout?
+      super
+    end
+  end
+
+  ::TopicsController.prepend ::TopicControllerLockdownExtension
 
   module ::CategoryLockdown
     def self.is_locked(guardian, topic)
@@ -40,6 +91,7 @@ after_initialize do
   module TopicViewLockdownExtension
     def check_and_raise_exceptions(skip_staff_action)
       super
+      return if ::RequestStore.store[:is_crawler] && SiteSetting.category_lockdown_allow_crawlers
       raise ::CategoryLockdown::NoAccessLocked.new if SiteSetting.category_lockdown_enabled && CategoryLockdown.is_locked(@guardian, @topic)
     end
   end
