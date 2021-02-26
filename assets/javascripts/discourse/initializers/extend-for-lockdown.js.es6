@@ -28,6 +28,18 @@ function initializeLockdown(api) {
     },
   });
 
+  api.modifyClass("component:topic-list-item", {
+    @discourseComputed
+    unboundClassNames() {
+      let classNames = this._super(...arguments) || "";
+      if (this.get("topic.is_locked_down")) {
+        classNames += " locked-down";
+      }
+
+      return classNames;
+    },
+  });
+
   // Add an icon next to locked-down topics
   TopicStatus.reopen({
     @discourseComputed()
