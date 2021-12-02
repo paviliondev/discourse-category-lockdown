@@ -108,6 +108,7 @@ after_initialize do
         include_ember: true
       }
       topic_id = params["topic_id"] || params["id"]
+      topic_id ||= params["topic"] # if coming from discourse-docs plugin
       topic = Topic.find(topic_id.to_i) if topic_id
       response = {
         error: "Payment Required",

@@ -56,6 +56,29 @@ function initializeLockdown(api) {
       return results;
     },
   });
+
+  api.modifyClassStatic("model:docs", {
+    list(params) {
+      return this._super(params).catch(error => {
+        let response = error.jqXHR.responseJSON;
+        const status = error.jqXHR.status;
+        if (status === 402) {
+          let redirectURL =
+            response.redirect_url ||
+            this.siteSettings.category_lockdown_redirect_url;
+
+          const external = redirectURL.startsWith("http");
+          if (external) {
+            // Use location.replace so that the user can go back in one click
+            document.location.replace(redirectURL);
+          } else {
+            // Handle the redirect inside ember
+            return DiscourseURL.handleURL(redirectURL, { replaceURL: true });
+          }
+        }
+      })
+    }
+  })
 }
 
 export default {
