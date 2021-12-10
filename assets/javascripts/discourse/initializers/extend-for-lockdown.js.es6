@@ -2,6 +2,7 @@ import { withPluginApi } from "discourse/lib/plugin-api";
 import { default as DiscourseURL } from "discourse/lib/url";
 import TopicStatus from "discourse/raw-views/topic-status";
 import discourseComputed from "discourse-common/utils/decorators";
+import { helperContext } from "discourse-common/lib/helpers";
 
 function initializeLockdown(api) {
   // Intercept any HTTP 402 (Payment Required) responses for topics
@@ -63,9 +64,10 @@ function initializeLockdown(api) {
         let response = error.jqXHR.responseJSON;
         const status = error.jqXHR.status;
         if (status === 402) {
+          // using helperContext() instead of `this` as as its a static context
           let redirectURL =
             response.redirect_url ||
-            this.siteSettings.category_lockdown_redirect_url;
+            helperContext().siteSettings.category_lockdown_redirect_url;
 
           const external = redirectURL.startsWith("http");
           if (external) {
