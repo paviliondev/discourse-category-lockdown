@@ -76,9 +76,9 @@ function initializeLockdown(api) {
             return DiscourseURL.handleURL(redirectURL, { replaceURL: true });
           }
         }
-      })
+      });
     }
-  })
+  });
 }
 
 export default {
