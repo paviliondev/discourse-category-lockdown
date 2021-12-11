@@ -58,21 +58,22 @@ function initializeLockdown(api) {
     },
   });
 
-  api.modifyClassStatic("model:docs", {
-    list(params) {
+  api.modifyClass("route:docs-index", {
+    model(params, transition) {
       return this._super(params).catch(error => {
         let response = error.jqXHR.responseJSON;
         const status = error.jqXHR.status;
         if (status === 402) {
-          // using helperContext() instead of `this` as as its a static context
+          // abort the transition to prevent momentary error
+          // from being displayed
+          transition.abort();
           let redirectURL =
             response.redirect_url ||
-            helperContext().siteSettings.category_lockdown_redirect_url;
+            this.siteSettings.category_lockdown_redirect_url;
 
           const external = redirectURL.startsWith("http");
           if (external) {
-            // Use location.replace so that the user can go back in one click
-            document.location.replace(redirectURL);
+            document.location.href = redirectURL;
           } else {
             // Handle the redirect inside ember
             return DiscourseURL.handleURL(redirectURL, { replaceURL: true });
