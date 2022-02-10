@@ -8,6 +8,7 @@
 enabled_site_setting :category_lockdown_enabled
 
 register_asset 'stylesheets/lockdown.scss'
+require 'request_store'
 
 after_initialize do
   Site.preloaded_category_custom_fields << 'redirect_url'
