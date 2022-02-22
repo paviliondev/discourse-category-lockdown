@@ -11,6 +11,8 @@ register_asset 'stylesheets/lockdown.scss'
 require 'request_store'
 
 after_initialize do
+  register_category_custom_field_type('redirect_url', :string)
+
   Site.preloaded_category_custom_fields << 'redirect_url'
   add_to_serializer(:basic_category, :redirect_url, false) do
     object.custom_fields['redirect_url']
