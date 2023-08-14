@@ -8,9 +8,11 @@ plugins:
   category_lockdown_redirect_url:
     default: "/"
     client: true
-  category_lockdown_allow_crawlers: 
+  category_lockdown_allow_crawlers:
     default: false
   category_lockdown_crawler_noarchive:
     default: true
   category_lockdown_crawler_indicate_paywall:
     default: true
+  allow_own_topics_in_locked_category:
+    default: false

@@ -72,6 +72,11 @@ after_initialize do
     def self.is_locked(guardian, topic)
       return false if guardian.is_admin?
 
+      # Check if the feature is enabled and the user is the author of the topic
+      if SiteSetting.allow_own_topics_in_locked_category && guardian&.user&.id == topic&.user_id
+        return false
+      end
+
       locked_down = topic.category&.custom_fields&.[]("lockdown_enabled") == "true"
       return false if !locked_down
 
