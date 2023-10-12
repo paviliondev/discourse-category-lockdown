@@ -8,7 +8,7 @@ plugins:
   category_lockdown_redirect_url:
     default: "/"
     client: true
-  category_lockdown_allow_crawlers:
+  category_lockdown_allow_crawlers: 
     default: false
   category_lockdown_crawler_noarchive:
     default: true

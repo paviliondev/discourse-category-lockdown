@@ -43,7 +43,7 @@ after_initialize do
               'isAccessibleForFree' => 'False',
               'cssSelector' => 'body'
             },
-          ).gsub("</", "<\\/").html_safe,
+          ).gsub("</", "<\\/").html_safe, 
           '</script>',
         ].join("")  
       end
@@ -99,8 +99,8 @@ after_initialize do
     def check_and_raise_exceptions(skip_staff_action)
       super
       return if ::RequestStore.store[:is_crawler] && SiteSetting.category_lockdown_allow_crawlers
-        raise ::CategoryLockdown::NoAccessLocked.new if SiteSetting.category_lockdown_enabled && CategoryLockdown.is_locked(@guardian, @topic)
-            end
+      raise ::CategoryLockdown::NoAccessLocked.new if SiteSetting.category_lockdown_enabled && CategoryLockdown.is_locked(@guardian, @topic)
+    end
   end
 
   ::TopicView.prepend TopicViewLockdownExtension
@@ -139,7 +139,7 @@ after_initialize do
 
     def can_see_post?(post)
       return old_can_see_post?(post) unless SiteSetting.category_lockdown_enabled
-        
+
       return false if !old_can_see_post?(post)
       return false if ::CategoryLockdown.is_locked(self, post.topic)
 
