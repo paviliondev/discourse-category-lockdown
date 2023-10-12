@@ -6,4 +6,4 @@ en:
     category_lockdown_allow_crawlers: Allow crawlers to access locked content if "everyone can see" is enabled.
     category_lockdown_crawler_noarchive: Add a 'noarchive' meta tag to disable search engine cache.
     category_lockdown_crawler_indicate_paywall: Add Schema.org metadata to indicate paywalled content.
-    allow_own_topics_in_locked_category: "Allow authors to view and post their own topics in locked categories"
+    allow_authors_in_locked_categories: "Allow authors to view and reply their own topics in locked categories"

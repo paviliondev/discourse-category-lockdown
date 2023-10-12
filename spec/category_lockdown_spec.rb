@@ -68,10 +68,8 @@ RSpec.describe 'CategoryLockdown', type: :request do
       get "/t/#{topic.slug}/#{topic.id}"
       expect(response.code).to eq("200")
     end
-    context "with allow_own_topics_in_locked_category enabled" do
-      before do
-        SiteSetting.allow_own_topics_in_locked_category = true
-      end
+    context "with allow_authors_in_locked_categories enabled" do
+      before { SiteSetting.allow_authors_in_locked_categories = true }
 
       it 'allows authors access to their own topics' do
         sign_in(author) # user is the author of the topic

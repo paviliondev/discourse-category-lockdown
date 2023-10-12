@@ -32,20 +32,20 @@ after_initialize do
       inject = []
       if SiteSetting.category_lockdown_crawler_indicate_paywall
         inject.push [
-          '<script type="application/ld+json">', 
-          MultiJson.dump(
-            '@context' => 'http://schema.org',
-            '@type' => 'CreativeWork',
-            'name' => topic&.title,
-            'isAccessibleForFree' => 'False',
-            'hasPart' => {
-              '@type' => 'DiscussionForumPosting',
-              'isAccessibleForFree' => 'False',
-              'cssSelector' => 'body'
-            },
-          ).gsub("</", "<\\/").html_safe, 
-          '</script>',
-        ].join("")  
+                      '<script type="application/ld+json">',
+                      MultiJson.dump(
+                          '@context' => 'http://schema.org',
+                          '@type' => 'CreativeWork',
+                          'name' => topic&.title,
+                          'isAccessibleForFree' => 'False',
+                          'hasPart' => {
+                            '@type' => 'DiscussionForumPosting',
+                            'isAccessibleForFree' => 'False',
+                            'cssSelector' => 'body'
+                          },
+          ).gsub("</", "<\\/").html_safe,
+                      '</script>',
+                    ].join("")
       end
       if SiteSetting.category_lockdown_crawler_noarchive
         inject.push '<meta name="robots" content="noarchive">'
@@ -72,8 +72,8 @@ after_initialize do
     def self.is_locked(guardian, topic)
       return false if guardian.is_admin?
 
-      # Check if the feature is enabled and the user is the author of the topic
-      if SiteSetting.allow_own_topics_in_locked_category && guardian&.user&.id == topic&.user_id
+      if SiteSetting.allow_authors_in_locked_categories &&
+           guardian&.user&.id == topic&.user_id
         return false
       end
 
@@ -99,8 +99,8 @@ after_initialize do
     def check_and_raise_exceptions(skip_staff_action)
       super
       return if ::RequestStore.store[:is_crawler] && SiteSetting.category_lockdown_allow_crawlers
-      raise ::CategoryLockdown::NoAccessLocked.new if SiteSetting.category_lockdown_enabled && CategoryLockdown.is_locked(@guardian, @topic)
-    end
+        raise ::CategoryLockdown::NoAccessLocked.new if SiteSetting.category_lockdown_enabled && CategoryLockdown.is_locked(@guardian, @topic)
+            end
   end
 
   ::TopicView.prepend TopicViewLockdownExtension
@@ -139,7 +139,7 @@ after_initialize do
 
     def can_see_post?(post)
       return old_can_see_post?(post) unless SiteSetting.category_lockdown_enabled
-
+        
       return false if !old_can_see_post?(post)
       return false if ::CategoryLockdown.is_locked(self, post.topic)
 
