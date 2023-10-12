@@ -32,20 +32,20 @@ after_initialize do
       inject = []
       if SiteSetting.category_lockdown_crawler_indicate_paywall
         inject.push [
-                      '<script type="application/ld+json">',
-                      MultiJson.dump(
-                          '@context' => 'http://schema.org',
-                          '@type' => 'CreativeWork',
-                          'name' => topic&.title,
-                          'isAccessibleForFree' => 'False',
-                          'hasPart' => {
-                            '@type' => 'DiscussionForumPosting',
-                            'isAccessibleForFree' => 'False',
-                            'cssSelector' => 'body'
-                          },
+          '<script type="application/ld+json">',
+          MultiJson.dump(
+              '@context' => 'http://schema.org',
+              '@type' => 'CreativeWork',
+              'name' => topic&.title,
+              'isAccessibleForFree' => 'False',
+              'hasPart' => {
+                '@type' => 'DiscussionForumPosting',
+                'isAccessibleForFree' => 'False',
+                'cssSelector' => 'body'
+              },
           ).gsub("</", "<\\/").html_safe,
-                      '</script>',
-                    ].join("")
+          '</script>',
+        ].join("")
       end
       if SiteSetting.category_lockdown_crawler_noarchive
         inject.push '<meta name="robots" content="noarchive">'
