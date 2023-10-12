@@ -7,7 +7,8 @@ RSpec.describe 'CategoryLockdown', type: :request do
   end
 
   let(:category) { Fabricate(:category) }
-  let(:topic) { Fabricate(:topic, category: category, user: user) }
+  let(:author) { Fabricate(:user) }
+  let(:topic) { Fabricate(:topic, category: category, user: author) }
   let(:allowed_group) { Fabricate(:group) }
   let(:allowed_user) { Fabricate(:user, groups: [allowed_group]) }
   let(:user) { Fabricate(:user) }
@@ -50,6 +51,11 @@ RSpec.describe 'CategoryLockdown', type: :request do
       get "/t/#{topic.slug}/#{topic.id}"
       expect(response.code).to eq("301")
     end
+    it "doesn't allow author access" do
+      sign_in(author)
+      get "/t/#{topic.slug}/#{topic.id}"
+      expect(response.code).to eq('301')
+    end
 
     it "allows admins access" do
       sign_in(admin)
@@ -67,8 +73,8 @@ RSpec.describe 'CategoryLockdown', type: :request do
         SiteSetting.allow_own_topics_in_locked_category = true
       end
 
-      it "allows authors access to their own topics" do
-        sign_in(user) # user is the author of the topic
+      it 'allows authors access to their own topics' do
+        sign_in(author) # user is the author of the topic
         get "/t/#{topic.slug}/#{topic.id}"
         expect(response.code).to eq("200")
       end
