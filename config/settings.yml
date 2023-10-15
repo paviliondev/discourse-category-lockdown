@@ -14,3 +14,5 @@ plugins:
     default: true
   category_lockdown_crawler_indicate_paywall:
     default: true
+  allow_authors_in_locked_categories:
+    default: false
