@@ -2,8 +2,8 @@
 # name: discourse-category-lockdown
 # about: Set all topics in a category to redirect, unless part of a specified group
 # version: 0.1
-# authors: David Taylor
-# url: https://github.com/davidtaylorhq/discourse-category-lockdown
+# authors: David Taylor, Angus McLeod, Robert Barrow, Juan Marcos Gutierrez Ramos
+# url: https://github.com/paviliondev/discourse-category-lockdown
 
 enabled_site_setting :category_lockdown_enabled
 
