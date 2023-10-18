@@ -4,10 +4,13 @@ import TopicStatus from "discourse/raw-views/topic-status";
 import discourseComputed from "discourse-common/utils/decorators";
 import { helperContext } from "discourse-common/lib/helpers";
 
+const PLUGIN_ID = "discourse-category-lockdown";
+
 function initializeLockdown(api) {
   // Intercept any HTTP 402 (Payment Required) responses for topics
   // And redirect the client accordingly
   api.modifyClass("model:post-stream", {
+    pluginId: PLUGIN_ID,
     errorLoading(result) {
       const status = result.jqXHR.status;
       let response = result.jqXHR.responseJSON;
@@ -30,6 +33,7 @@ function initializeLockdown(api) {
   });
 
   api.modifyClass("component:topic-list-item", {
+    pluginId: PLUGIN_ID,
     @discourseComputed
     unboundClassNames() {
       let classNames = this._super(...arguments) || "";
@@ -57,8 +61,10 @@ function initializeLockdown(api) {
       return results;
     },
   });
-
+  
+  // Warning: "route:docs-index" may not be found if the 'discourse-docs' plugin is not installed. This is expected and harmless.
   api.modifyClass("route:docs-index", {
+    pluginId: PLUGIN_ID,
     model(params, transition) {
       return this._super(params).catch(error => {
         let response = error.jqXHR.responseJSON;
