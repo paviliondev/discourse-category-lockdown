@@ -14,6 +14,10 @@ after_initialize do
   register_category_custom_field_type('redirect_url', :string)
 
   Site.preloaded_category_custom_fields << 'redirect_url'
+  if defined?(register_category_list_preloaded_category_custom_fields)
+    register_category_list_preloaded_category_custom_fields('redirect_url')
+  end
+
   add_to_serializer(:basic_category, :redirect_url, false) do
     object.custom_fields['redirect_url']
   end
