@@ -1,8 +1,8 @@
 en:
   js:
     lockdown:
-      lockdown_enabled: "Redirect topic viewers to a different URL, unless in allowed groups?"
-      lockdown_allowed_groups: "Groups which are allowed to view topics without redirection"
+      lockdown_enabled: "Redirect topic viewers to a different URL, unless in allowed groups"
+      lockdown_allowed_groups: "Members of these groups are allowed to view topics without redirection"
       topic_is_locked_down: "This topic is only available to members of certain groups"
       category_setting_heading: "Category Lockdown"
       redirect_url: "URL to redirect to"
