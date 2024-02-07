@@ -20,7 +20,7 @@ RSpec.describe 'CategoryLockdown', type: :request do
 
   context "with category locked down" do
     before do
-      category.custom_fields["lockdown_enabled"] = "true"
+      category.custom_fields["lockdown_enabled"] = "t"
       category.custom_fields["lockdown_allowed_groups"] = allowed_group.name
       category.save!
     end

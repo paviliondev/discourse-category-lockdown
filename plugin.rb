@@ -1,8 +1,8 @@
 # frozen_string_literal: true
 # name: discourse-category-lockdown
 # about: Set all topics in a category to redirect, unless part of a specified group
-# version: 0.1
-# authors: David Taylor, Angus McLeod, Robert Barrow, Juan Marcos Gutierrez Ramos
+# version: 1.0
+# authors: Pavilion
 # url: https://github.com/paviliondev/discourse-category-lockdown
 
 enabled_site_setting :category_lockdown_enabled
@@ -36,7 +36,7 @@ after_initialize do
       inject = []
       if SiteSetting.category_lockdown_crawler_indicate_paywall
         inject.push [
-          '<script type="application/ld+json">', 
+          '<script type="application/ld+json">',
           MultiJson.dump(
             '@context' => 'http://schema.org',
             '@type' => 'CreativeWork',
@@ -47,9 +47,9 @@ after_initialize do
               'isAccessibleForFree' => 'False',
               'cssSelector' => 'body'
             },
-          ).gsub("</", "<\\/").html_safe, 
+          ).gsub("</", "<\\/").html_safe,
           '</script>',
-        ].join("")  
+        ].join("")
       end
       if SiteSetting.category_lockdown_crawler_noarchive
         inject.push '<meta name="robots" content="noarchive">'
@@ -76,7 +76,7 @@ after_initialize do
     def self.is_locked(guardian, topic)
       return false if guardian.is_admin?
 
-      locked_down = topic.category&.custom_fields&.[]("lockdown_enabled") == "true"
+      locked_down = ["true", "t", true].include?(topic.category&.custom_fields&.[]("lockdown_enabled"))
       return false if !locked_down
 
       allowed_groups = topic.category&.custom_fields&.[]("lockdown_allowed_groups")

@@ -3,23 +3,28 @@
     <label class="checkbox-label">
       <Input
         @type="checkbox"
-        @checked={{readonly this.category.lockdown_enabled}}
-        {{on "change" (action "onChangeSetting" value="target.checked")}}
+        @checked={{this.args.outletArgs.category.custom_fields.lockdown_enabled}}
       />
       {{i18n "lockdown.lockdown_enabled"}}
     </label>
   </section>
-  {{#if category.lockdown_enabled}}
+  {{#if this.args.outletArgs.category.custom_fields.lockdown_enabled}}
     <section class="field">
       <label>
         {{i18n "lockdown.redirect_url"}}
       </label>
-      <Input @type="text" @value={{this.category.redirect_url}} />
+      <Input @type="text" @value={{this.args.outletArgs.category.custom_fields.redirect_url}} />
     </section>
     <section class="field">
       <label>
         {{i18n "lockdown.lockdown_allowed_groups"}}:
       </label>
-      {{group-selector groupNames=category.custom_fields.lockdown_allowed_groups groupFinder=groupFinder classNames="lockdownAllowedGroups"}}
+      <GroupChooser
+        @content={{this.availableGroups}}
+        @valueProperty={{null}}
+        @nameProperty={{null}}
+        @value={{this.selectedGroups}}
+        @onChange={{this.onChangeGroups}}
+      />
     </section>
   {{/if}}
