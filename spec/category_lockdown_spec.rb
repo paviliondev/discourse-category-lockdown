@@ -62,6 +62,17 @@ RSpec.describe 'CategoryLockdown', type: :request do
       get "/t/#{topic.slug}/#{topic.id}"
       expect(response.code).to eq("200")
     end
-  end
 
+    context "with a redirect url" do
+      before do
+        category.custom_fields['redirect_url'] = "https://google.com"
+        category.save_custom_fields(true)
+      end
+
+      it "redirects to an external url" do
+        get "/t/#{topic.slug}/#{topic.id}"
+        expect(response).to redirect_to("https://google.com")
+      end
+    end
+  end
 end
