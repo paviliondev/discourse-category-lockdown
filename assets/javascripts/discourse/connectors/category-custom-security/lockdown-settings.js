@@ -1,8 +1,7 @@
-import Component from '@glimmer/component';
-import Group from "discourse/models/group";
+import Component from "@glimmer/component";
+import { tracked } from "@glimmer/tracking";
 import { action, computed } from "@ember/object";
-import { inject as service } from "@ember/service";
-import { tracked } from '@glimmer/tracking';
+import { service } from "@ember/service";
 
 export default class LockdownSettings extends Component {
   @service site;
@@ -10,7 +9,11 @@ export default class LockdownSettings extends Component {
 
   constructor() {
     super(...arguments);
-    this.selectedGroups = (this.args.outletArgs.category.custom_fields.lockdown_allowed_groups || "").split(",").filter(Boolean);
+    this.selectedGroups = (
+      this.args.outletArgs.category.custom_fields.lockdown_allowed_groups || ""
+    )
+      .split(",")
+      .filter(Boolean);
   }
 
   @computed("site.groups.[]")
@@ -23,10 +26,10 @@ export default class LockdownSettings extends Component {
       .filter(Boolean);
   }
 
-
   @action
   onChangeGroups(values) {
     this.selectedGroups = values;
-    this.args.outletArgs.category.custom_fields.lockdown_allowed_groups = values.join(",");
+    this.args.outletArgs.category.custom_fields.lockdown_allowed_groups =
+      values.join(",");
   }
-};
+}

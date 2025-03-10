@@ -1,8 +1,8 @@
+import I18n from "I18n";
 import { withPluginApi } from "discourse/lib/plugin-api";
 import { default as DiscourseURL } from "discourse/lib/url";
 import TopicStatus from "discourse/raw-views/topic-status";
 import discourseComputed from "discourse-common/utils/decorators";
-import { helperContext } from "discourse-common/lib/helpers";
 
 const PLUGIN_ID = "discourse-category-lockdown";
 
@@ -61,12 +61,12 @@ function initializeLockdown(api) {
       return results;
     },
   });
-  
+
   // Warning: "route:docs-index" may not be found if the 'discourse-docs' plugin is not installed. This is expected and harmless.
   api.modifyClass("route:docs-index", {
     pluginId: PLUGIN_ID,
     model(params, transition) {
-      return this._super(params).catch(error => {
+      return this._super(params).catch((error) => {
         let response = error.jqXHR.responseJSON;
         const status = error.jqXHR.status;
         if (status === 402) {
@@ -86,7 +86,7 @@ function initializeLockdown(api) {
           }
         }
       });
-    }
+    },
   });
 }
 

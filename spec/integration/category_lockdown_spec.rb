@@ -1,13 +1,12 @@
 # frozen_string_literal: true
-require 'rails_helper'
+require "rails_helper"
 
-RSpec.describe 'CategoryLockdown', type: :request do
-  before do
-    SiteSetting.category_lockdown_enabled = true
-  end
+RSpec.describe "CategoryLockdown", type: :request do
+  before { SiteSetting.category_lockdown_enabled = true }
 
   let(:category) { Fabricate(:category) }
   let(:topic) { Fabricate(:topic, category: category) }
+  let!(:post) { Fabricate(:post, topic: topic) }
   let(:allowed_group) { Fabricate(:group) }
   let(:allowed_user) { Fabricate(:user, groups: [allowed_group]) }
   let(:user) { Fabricate(:user) }
@@ -31,16 +30,22 @@ RSpec.describe 'CategoryLockdown', type: :request do
       expect(response.code).to eq("200")
     end
 
-    it "doesn't allow public access" do
+    it "doesn't allow public access to the topic url" do
       get "/t/#{topic.slug}/#{topic.id}"
-      expect(response.code).to eq("402")
+      expect(response).to redirect_to("#{Discourse.base_url}/")
+    end
 
+    it "doesn't allow public access to the print url"do
       get "/t/#{topic.slug}/#{topic.id}/print"
-      expect(response.code).to eq("402")
+      expect(response).to redirect_to("#{Discourse.base_url}/")
+    end
 
+    it "doesn't allow public access to the rss url" do
       get "/t/#{topic.slug}/#{topic.id}.rss"
-      expect(response.code).to eq("402")
+      expect(response).to redirect_to("#{Discourse.base_url}/")
+    end
 
+    it "doesn't allow public access to the raw url" do
       get "/raw/#{topic.id}/1"
       expect(response.code).to eq("404")
     end
@@ -48,7 +53,7 @@ RSpec.describe 'CategoryLockdown', type: :request do
     it "doesn't allow any user access" do
       sign_in(user)
       get "/t/#{topic.slug}/#{topic.id}"
-      expect(response.code).to eq("402")
+      expect(response).to redirect_to("#{Discourse.base_url}/")
     end
 
     it "allows admins access" do
@@ -65,7 +70,7 @@ RSpec.describe 'CategoryLockdown', type: :request do
 
     context "with a redirect url" do
       before do
-        category.custom_fields['redirect_url'] = "https://google.com"
+        category.custom_fields["redirect_url"] = "https://google.com"
         category.save_custom_fields(true)
       end
 

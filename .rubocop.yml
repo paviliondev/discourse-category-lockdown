@@ -1,0 +1,25 @@
+inherit_gem:
+  rubocop-discourse: stree-compat.yml
+
+AllCops:
+  Exclude:
+    - 'gems/**/*'
+    - 'vendor/**/*'
+
+RSpec/ContextWording:
+  Enabled: false
+
+RSpec/DescribeClass:
+  Enabled: false
+
+Discourse/TimeEqMatcher:
+  Enabled: false
+
+Discourse/NoAddReferenceOrAliasesActiveRecordMigration:
+  Enabled: false
+
+Lint/BooleanSymbol:
+  Enabled: false
+
+Discourse/Plugins/NoMonkeyPatching:
+  Enabled: false
