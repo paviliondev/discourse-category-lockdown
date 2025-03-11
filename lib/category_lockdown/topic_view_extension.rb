@@ -1,3 +1,6 @@
+# frozen_string_literal: true
+require "request_store"
+
 module CategoryLockdown::TopicViewExtension
   def check_and_raise_exceptions(skip_staff_action)
     super

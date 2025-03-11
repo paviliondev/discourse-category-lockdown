@@ -1,4 +1,4 @@
-
+# frozen_string_literal: true
 
 # Restrict access to posts (e.g. /raw/12/2)
 # Also covers notifications, so people cannot 'watch' the topic

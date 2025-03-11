@@ -1,8 +1,8 @@
-import I18n from "I18n";
 import { withPluginApi } from "discourse/lib/plugin-api";
 import { default as DiscourseURL } from "discourse/lib/url";
 import TopicStatus from "discourse/raw-views/topic-status";
 import discourseComputed from "discourse-common/utils/decorators";
+import I18n from "I18n";
 
 const PLUGIN_ID = "discourse-category-lockdown";
 

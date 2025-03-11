@@ -35,7 +35,7 @@ RSpec.describe "CategoryLockdown", type: :request do
       expect(response).to redirect_to("#{Discourse.base_url}/")
     end
 
-    it "doesn't allow public access to the print url"do
+    it "doesn't allow public access to the print url" do
       get "/t/#{topic.slug}/#{topic.id}/print"
       expect(response).to redirect_to("#{Discourse.base_url}/")
     end
@@ -77,6 +77,25 @@ RSpec.describe "CategoryLockdown", type: :request do
       it "redirects to an external url" do
         get "/t/#{topic.slug}/#{topic.id}"
         expect(response).to redirect_to("https://google.com")
+      end
+    end
+
+    context "with a crawler request" do
+      it "doesn't allow access" do
+        get "/t/#{topic.slug}/#{topic.id}", headers: { "HTTP_USER_AGENT" => "Googlebot" }
+        expect(response).to redirect_to("#{Discourse.base_url}/")
+      end
+
+      context "with category_lockdown_allow_crawlers enabled" do
+        before { SiteSetting.category_lockdown_allow_crawlers = true }
+
+        it "injects the right markup" do
+          get "/t/#{topic.slug}/#{topic.id}", headers: { "HTTP_USER_AGENT" => "Googlebot" }
+          expect(response.body).to include(
+            "<script type=\"application/ld+json\">{\"@context\":\"http://schema.org\",\"@type\":\"CreativeWork\",\"name\":\"#{topic&.title}\",\"isAccessibleForFree\":\"False\",\"hasPart\":{\"@type\":\"DiscussionForumPosting\",\"isAccessibleForFree\":\"False\",\"cssSelector\":\"body\"}}</script>",
+          )
+          expect(response.body).to include("<meta name=\"robots\" content=\"noarchive\">")
+        end
       end
     end
   end

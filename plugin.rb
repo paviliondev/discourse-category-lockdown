@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 # name: discourse-category-lockdown
 # about: Set all topics in a category to redirect, unless part of a specified group
-# version: 1.1.0
+# version: 1.1.1
 # authors: Pavilion
 # meta_topic_id: 70649
 # url: https://github.com/paviliondev/discourse-category-lockdown
@@ -13,47 +13,10 @@ module ::CategoryLockdown
   PLUGIN_NAME = "category-lockdown"
 end
 require_relative "lib/category_lockdown/engine"
-require "request_store"
 
 after_initialize do
   register_html_builder("server:before-head-close-crawler") do |controller|
-    return "" if !controller.instance_of? TopicsController
-    return "" unless SiteSetting.category_lockdown_enabled
-    return "" unless SiteSetting.category_lockdown_allow_crawlers
-    return "" unless ::RequestStore.store[:is_crawler]
-
-    topic_view = controller.instance_variable_get(:@topic_view)
-    topic = topic_view&.topic
-    return "" if !topic
-
-    if CategoryLockdown.is_locked(controller.guardian, topic)
-      inject = []
-      if SiteSetting.category_lockdown_crawler_indicate_paywall
-        inject.push [
-                      '<script type="application/ld+json">',
-                      MultiJson
-                        .dump(
-                          "@context" => "http://schema.org",
-                          "@type" => "CreativeWork",
-                          "name" => topic&.title,
-                          "isAccessibleForFree" => "False",
-                          "hasPart" => {
-                            "@type" => "DiscussionForumPosting",
-                            "isAccessibleForFree" => "False",
-                            "cssSelector" => "body",
-                          },
-                        )
-                        .gsub("</", "<\\/")
-                        .html_safe,
-                      "</script>",
-                    ].join("")
-      end
-      if SiteSetting.category_lockdown_crawler_noarchive
-        inject.push '<meta name="robots" content="noarchive">'
-      end
-
-      inject.join("\n")
-    end
+    ::CategoryLockdown::CrawlerHtmlBuilder.perform(controller)
   end
 
   rescue_from(::CategoryLockdown::NoAccessLocked) do
