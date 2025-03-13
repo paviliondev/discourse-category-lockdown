@@ -1,8 +1,5 @@
 import { withPluginApi } from "discourse/lib/plugin-api";
 import { default as DiscourseURL } from "discourse/lib/url";
-import TopicStatus from "discourse/raw-views/topic-status";
-import discourseComputed from "discourse-common/utils/decorators";
-import I18n from "I18n";
 
 const PLUGIN_ID = "discourse-category-lockdown";
 
@@ -32,35 +29,14 @@ function initializeLockdown(api) {
     },
   });
 
-  api.modifyClass("component:topic-list-item", {
-    pluginId: PLUGIN_ID,
-    @discourseComputed
-    unboundClassNames() {
-      let classNames = this._super(...arguments) || "";
-      if (this.get("topic.is_locked_down")) {
-        classNames += " locked-down";
+  api.registerValueTransformer("topic-list-item-class",
+    ({value, context}) => {
+      if (context.topic.get("is_locked_down")) {
+        value.push("locked-down");
       }
-
-      return classNames;
-    },
-  });
-
-  // Add an icon next to locked-down topics
-  TopicStatus.reopen({
-    @discourseComputed()
-    statuses() {
-      const results = this._super();
-      if (this.topic.is_locked_down) {
-        results.push({
-          openTag: "span",
-          closeTag: "span",
-          title: I18n.t("lockdown.topic_is_locked_down"),
-          icon: this.siteSettings.category_lockdown_list_icon,
-        });
-      }
-      return results;
-    },
-  });
+      return value;
+    }
+  );
 
   // Warning: "route:docs-index" may not be found if the 'discourse-docs' plugin is not installed. This is expected and harmless.
   api.modifyClass("route:docs-index", {
@@ -94,6 +70,6 @@ export default {
   name: "apply-lockdown",
 
   initialize() {
-    withPluginApi("0.1", initializeLockdown);
+    withPluginApi("1.35.0", initializeLockdown);
   },
 };
