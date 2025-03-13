@@ -41,23 +41,6 @@ function initializeLockdown(api) {
     }
   );
 
-  // Add an icon next to locked-down topics
-  TopicStatus.reopen({
-    @discourseComputed()
-    statuses() {
-      const results = this._super();
-      if (this.topic.is_locked_down) {
-        results.push({
-          openTag: "span",
-          closeTag: "span",
-          title: I18n.t("lockdown.topic_is_locked_down"),
-          icon: this.siteSettings.category_lockdown_list_icon,
-        });
-      }
-      return results;
-    },
-  });
-
   // Warning: "route:docs-index" may not be found if the 'discourse-docs' plugin is not installed. This is expected and harmless.
   api.modifyClass("route:docs-index", {
     pluginId: PLUGIN_ID,
