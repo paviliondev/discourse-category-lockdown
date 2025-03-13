@@ -1,8 +1,5 @@
 import { withPluginApi } from "discourse/lib/plugin-api";
 import { default as DiscourseURL } from "discourse/lib/url";
-import TopicStatus from "discourse/raw-views/topic-status";
-import discourseComputed from "discourse-common/utils/decorators";
-import I18n from "I18n";
 
 const PLUGIN_ID = "discourse-category-lockdown";
 
@@ -73,6 +70,6 @@ export default {
   name: "apply-lockdown",
 
   initialize() {
-    withPluginApi("0.1", initializeLockdown);
+    withPluginApi("1.35.0", initializeLockdown);
   },
 };
