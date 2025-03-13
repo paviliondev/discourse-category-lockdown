@@ -32,18 +32,14 @@ function initializeLockdown(api) {
     },
   });
 
-  api.modifyClass("component:topic-list-item", {
-    pluginId: PLUGIN_ID,
-    @discourseComputed
-    unboundClassNames() {
-      let classNames = this._super(...arguments) || "";
-      if (this.get("topic.is_locked_down")) {
-        classNames += " locked-down";
+  api.registerValueTransformer("topic-list-item-class",
+    ({value, context}) => {
+      if (context.topic.get("is_locked_down")) {
+        value.push("locked-down");
       }
-
-      return classNames;
-    },
-  });
+      return value;
+    }
+  );
 
   // Add an icon next to locked-down topics
   TopicStatus.reopen({
